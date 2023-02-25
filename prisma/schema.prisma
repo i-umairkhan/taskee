@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// A user can have multiple projects and a project can have multiple tasks
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email     String
+  firstName String
+  lastName  String
+  password  String
+  projects  Project[] // 1 to M relationship with Project
+  tasks     Task[] // 1 to M relationship with Task
+}
+
+model Project {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id])
+  description String?
+  due         DateTime?
+  deleted     Boolean   @default(false)
+
+  tasks Task[] // 1 to M relationship with Task
+
+  @@unique([ownerId, name])
+  @@index([ownerId, id])
+}
+
+enum TASK_STATUS {
+  NOT_STARTED
+  STARTED
+  COMPLETED
+}
+
+model Task {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status TASK_STATUS @default(NOT_STARTED)
+  name   String
+
+  ownerId   String
+  owner     User    @relation(fields: [ownerId], references: [id])
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  due     DateTime?
+  deleted Boolean   @default(false)
+
+  @@index([ownerId])
+}
