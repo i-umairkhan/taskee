@@ -1,7 +1,7 @@
 import GlassPane from "@/components/GlassPane";
 import "@/styles/global.css";
 
-export default function DashboardLayout({ children }) {
+export default function DashboardRootLayout({ children }) {
   return (
     <html lang="en">
       <head />
